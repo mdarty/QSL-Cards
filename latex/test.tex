@@ -1,0 +1,160 @@
+\documentclass[12pt,letterpaper,landscape]{letter}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{datatool}
+\usepackage[nocapaddress]{envlab}
+\usepackage{hyperref}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{graphicx}
+\usepackage{pgffor}
+\usepackage{mysettings}
+\DTLloaddb{mailing-list}{addresses.csv}
+\SetLabel 
+  {5.45in}  % width
+  {3.5in}  % height
+  {3mm} % top margin
+  {-6mm}  % left margin
+  {0mm}     % inter-label gap
+  {2}       % columns
+  {2}       % rows
+\makelabels % Tell envlab to make labels in the document.
+\makeatletter % We need to access some internal commands
+\newcommand*{\IfDataT}[1]{% Create a macro taking one argument
+  \ifx#1\empty
+    \expandafter\@gobble % Empty input: ignore the next thing
+  \else
+    \ifx#1\DTLstringnull
+      \expandafter\expandafter\expandafter
+        \@gobble % NULL input: ignore the next thing
+    \else
+      \expandafter\expandafter\expandafter
+        \@firstofone % Use the next thing unchanged
+    \fi
+  \fi
+} 
+\newcommand*{\IfDataTF}[1]{% Create a macro taking one argument
+  \ifx#1\empty
+    \expandafter\@secondoftwo % Empty value: use the False branch
+  \else
+    \ifx#1\DTLstringnull
+      \expandafter\expandafter\expandafter
+        \@secondoftwo % NULL value: use the False branch
+    \else
+      \expandafter\expandafter\expandafter
+        \@firstoftwo % A real value: use the True branch
+    \fi
+  \fi
+} 
+\makeatother
+
+\begin{document}
+% \DTLdisplaydb{}{mailing-list}
+\startlabels
+\DTLforeach{mailing-list}{%
+  \uid=index,
+  \Front=Front,
+  \call=CALL,
+  \date=date,
+  \time=time,
+  \band=BAND,
+  \freq=FREQ,
+  \mode=MODE,
+  \myGrid=MY_GRIDSQUARE,
+  \firstname=fname,
+  \lastname=name,
+  \rstRcvd=RST_RCVD,
+  \rstSent=RST_SENT,
+  \pwr=TX_PWR,
+  \street=addr1,
+  \town=addr2,
+  \state=state,
+  \zip=zip,
+  \Rig=Rig,
+  \Ant=Ant,
+  \sigInfo=MY_SIG_INFO%
+}{
+    \typeout{\Front}
+    \ifnum \Front = 1
+        \foreach \n in {0,...,3}{
+            \mlabel{}{
+                \vspace{0mm}
+                \ifodd \n
+                    \hspace{-2.4mm}
+                \else
+                    \hspace{-0.9mm}
+                \fi
+                \includegraphics[height=3.5in, width=5.5in]{\coverPic}
+            }
+        }
+    \fi
+    \mlabel{}{%
+             \begin{minipage}[t][3.41in][t]{5.31in}
+                 \hspace{0.2in}
+                 \begin{minipage}[t][3.4in][t]{3in}
+                    \vspace{2mm}
+                    \myname\\
+                    \mystreet\\
+                    \mytown, \mystate\unskip\ \myzip\\[5mm]
+                    Confirming QSO with: \fbox{\call}\\
+                    \begin{center}
+                        \begin{tabular}{|c|c|c|}
+                            \hline
+                            Date & UTC & QTH \\
+                            \hline
+                            \date & \time & \sigInfo \\
+                            \hline
+                        \end{tabular}
+                        \\[5mm]
+                        \begin{tabular}{|c|c|c|c|}
+                            \hline
+                            MHz & Mode & Send & Recv \\ 
+                            \hline
+                            \freq & \mode & \rstSent & \rstRcvd \\
+                            \hline
+                        \end{tabular}
+                        \\[5mm]
+                        \begin{tabular}{|c|c|c|}
+                            \hline
+                            Rig & PWR & Ant \\
+                            \hline
+                            \Rig & \pwr W & \Ant \\
+                            \hline
+                        \end{tabular}
+                        \\[5mm]
+                    \end{center}
+                    QSL: \hspace{5mm}
+                     \CheckBox[name=PSE\uid,checked=true]{PSE}\hspace{5mm}
+                     \CheckBox[name=TNX\uid,checked=false]{TNX}\\
+                 \end{minipage}
+                 \vline
+                 \hspace{0.1in}
+                 \noindent
+                 \begin{minipage}[t][3.4in][t]{1.9in}
+                     \vspace{4mm}
+                     \hfill
+                     \fbox{
+                         \begin{minipage}[t][18.5mm][t]{15.6mm}
+                             \vspace*{\fill}
+                             \begin{center}
+                             PLACE\\
+                             STAMP\\
+                             HERE
+                             \end{center}
+                             \vspace*{\fill}
+                         \end{minipage}
+                         }
+                         \vspace*{\fill}
+                         \begin{center}
+                         \fbox{\begin{minipage}{1.75in}
+                                    \firstname\unskip\ \lastname\\
+                                    \street \\ 
+                                    \town \IfDataT\town, \state \unskip\ \zip
+                               \end{minipage}
+                               }
+                         \vspace*{\fill}
+                         \end{center}
+                 \end{minipage}
+            \end{minipage}
+    }
+} 
+\end{document}

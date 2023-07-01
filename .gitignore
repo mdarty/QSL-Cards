@@ -1,3 +1,13 @@
+*.adi
+*.swp
+*.out
+*.aux
+BMW.jpg
+*.pdf
+mysettings.sty
+addresses.csv
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
